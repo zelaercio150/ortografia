@@ -20,7 +20,6 @@
             padding: 20px;
         }
 
-        /* Tela de cadastro */
         .register-overlay {
             position: fixed;
             top: 0;
@@ -88,7 +87,6 @@
             margin-top: 10px;
         }
 
-        /* Layout principal com ranking */
         .main-layout {
             display: flex;
             gap: 20px;
@@ -348,19 +346,19 @@
         <div class="game-container">
             <div class="header-stats">
                 <div class="round-box">📖 <span>Rodada</span> <span id="roundDisplay">1</span> / <span id="totalRounds">100</span></div>
-                <div class="timer-box">⏱️ <span>Tempo</span> <span id="timerDisplay">30</span>s</div>
+                <div class="timer-box">⏱️ <span>Tempo</span> <span id="timerDisplay">20</span>s</div>
                 <div class="score-box">🏆 <span>Pontos</span> <span id="scoreDisplay">0</span></div>
             </div>
             <div class="question-area">
                 <div class="question-text" id="questionText">Carregando pergunta...</div>
                 <div class="options-grid" id="optionsContainer"></div>
-                <div class="feedback" id="feedbackMsg">⏳ Você tem 30 segundos!</div>
+                <div class="feedback" id="feedbackMsg">⏳ Você tem 20 segundos!</div>
                 <button class="next-btn" id="nextBtn">▶ PRÓXIMA RODADA</button>
                 <div style="text-align: center; margin-top: 15px;">
                     <button class="reset-btn" id="resetBtn">🔄 REINICIAR JOGO</button>
                 </div>
             </div>
-            <footer>🎓 +10 por acerto | 30s por pergunta</footer>
+            <footer>🎓 +10 por acerto | 20s por pergunta</footer>
         </div>
         <div class="ranking-container">
             <h3>🏅 RANKING (TOP 50)</h3>
@@ -372,7 +370,7 @@
 </div>
 
 <script>
-    // ---------- PERGUNTAS (ortografia) ----------
+    // ---------- PERGUNTAS (ortografia) - SEM DICA DA PALAVRA CORRETA ----------
     const errosComuns = {
         "exceção": ["excessão", "ecceção", "exceção", "exeção"],
         "concessão": ["conceção", "conssessão", "concessão", "concissão"],
@@ -409,6 +407,7 @@
     
     const bank = [];
     const wordsList = Object.keys(errosComuns);
+    
     for (let i = 0; i < 100; i++) {
         const baseWord = wordsList[i % wordsList.length];
         const variants = errosComuns[baseWord];
@@ -416,19 +415,35 @@
         let wrongs = variants.filter(v => v !== correctSpelling);
         if (wrongs.length < 3) wrongs = [...wrongs, "grafia incorreta", "ortografia errada"].slice(0,3);
         let options = [correctSpelling, wrongs[0], wrongs[1], wrongs[2]];
+        // Embaralhar opções
         for (let i = options.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [options[i], options[j]] = [options[j], options[i]];
         }
-        bank.push({ id: i+1, question: `📝 Qual palavra está com ERRO? (Correta: "${correctSpelling}")`, options, correct: correctSpelling });
+        // PERGUNTA SEM DICA - apenas qual palavra contém erro
+        bank.push({ 
+            id: i+1, 
+            question: `📝 Qual das palavras abaixo está escrita de forma ERRADA?`, 
+            options: options, 
+            correct: correctSpelling 
+        });
     }
-    while(bank.length < 100) bank.push({ id: bank.length+1, question: "📝 Qual palavra está com ERRO?", options: ["excessão","exceção","execeção","exeção"], correct: "exceção" });
+    
+    // Garantir 100 perguntas
+    while(bank.length < 100) {
+        bank.push({ 
+            id: bank.length+1, 
+            question: "📝 Qual palavra está com ERRO de ortografia?", 
+            options: ["excessão", "exceção", "execeção", "exeção"], 
+            correct: "exceção" 
+        });
+    }
     if(bank.length > 100) bank.length = 100;
     
-    // --- Variáveis globais do jogo ---
-    let currentRound = 0, totalScore = 0, answered = false, timerInterval = null, timeLeft = 30;
+    // --- Variáveis do jogo ---
+    let currentRound = 0, totalScore = 0, answered = false, timerInterval = null, timeLeft = 20;
     let currentCorrectAnswer = "", currentOptionsList = [];
-    let playerData = null; // { nome, sobrenome, email }
+    let playerData = null;
     
     // Elementos DOM
     const registerScreen = document.getElementById("registerScreen");
@@ -465,7 +480,6 @@
     
     function updateRanking(playerName, playerEmail, score) {
         let ranking = getRanking();
-        // Evitar duplicidade: se o mesmo email já existe, atualiza a maior pontuação
         const existingIndex = ranking.findIndex(entry => entry.email === playerEmail);
         if (existingIndex !== -1) {
             if (score > ranking[existingIndex].score) {
@@ -475,9 +489,7 @@
         } else {
             ranking.push({ name: playerName, email: playerEmail, score: score });
         }
-        // Ordenar do maior score para o menor
         ranking.sort((a,b) => b.score - a.score);
-        // Manter apenas os 50 melhores
         if (ranking.length > 50) ranking = ranking.slice(0,50);
         saveRanking(ranking);
         displayRanking();
@@ -514,7 +526,7 @@
         rankingDiv.appendChild(list);
     }
     
-    // ----- Funções do timer e jogo -----
+    // ----- Funções do timer (20 segundos) -----
     function stopTimer() {
         if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         if (timerBox) timerBox.classList.remove("urgent");
@@ -522,7 +534,7 @@
     
     function startTimer() {
         stopTimer();
-        timeLeft = 30;
+        timeLeft = 20;
         timerDisplaySpan.innerText = timeLeft;
         if (timerBox) timerBox.classList.remove("urgent");
         timerInterval = setInterval(() => {
@@ -534,7 +546,7 @@
                     stopTimer();
                     if (!answered) {
                         answered = true;
-                        feedbackMsgDiv.innerHTML = `⏰ TEMPO ESGOTADO! A correta era "${currentCorrectAnswer}". +0 pontos.`;
+                        feedbackMsgDiv.innerHTML = `⏰ TEMPO ESGOTADO! A palavra correta era "${currentCorrectAnswer}". +0 pontos.`;
                         feedbackMsgDiv.style.background = "#ffd1d1";
                         const allBtns = document.querySelectorAll(".opt-btn");
                         allBtns.forEach(btn => {
@@ -571,7 +583,7 @@
             btn.addEventListener("click", () => handleAnswer(opt));
             optionsContainer.appendChild(btn);
         });
-        feedbackMsgDiv.innerHTML = "⏳ 30 segundos para responder!";
+        feedbackMsgDiv.innerHTML = "⏳ 20 segundos para responder!";
         feedbackMsgDiv.style.background = "#eef2f5";
         nextBtn.disabled = true;
         nextBtn.style.opacity = "0.6";
@@ -589,10 +601,10 @@
         if (isCorrect) {
             totalScore += 10;
             scoreDisplaySpan.innerText = totalScore;
-            feedbackMsgDiv.innerHTML = `🎉 CORRETO! +10 pontos! Tempo: ${timeLeft}s restantes 🎉`;
+            feedbackMsgDiv.innerHTML = `🎉 CORRETO! +10 pontos! Tempo restante: ${timeLeft}s 🎉`;
             feedbackMsgDiv.style.background = "#c8e6c9";
         } else {
-            feedbackMsgDiv.innerHTML = `❌ ERRADO! A correta é "${currentCorrectAnswer}". +0 pontos. ❌`;
+            feedbackMsgDiv.innerHTML = `❌ ERRADO! A palavra correta é "${currentCorrectAnswer}". +0 pontos. ❌`;
             feedbackMsgDiv.style.background = "#ffd1d1";
         }
         const allBtns = document.querySelectorAll(".opt-btn");
@@ -675,7 +687,6 @@
     nextBtn.addEventListener("click", nextRound);
     resetBtn.addEventListener("click", resetGame);
     
-    // Carregar ranking ao iniciar (escondido)
     displayRanking();
 </script>
 </body>
