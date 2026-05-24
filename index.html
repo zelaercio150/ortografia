@@ -415,7 +415,7 @@
     <div class="main-layout">
         <div class="game-container">
             <div class="header-stats">
-                <div class="round-box">📖 <span>Rodada</span> <span id="roundDisplay">1</span> / <span id="totalRounds">100</span></div>
+                <div class="round-box">📖 <span>Rodada</span> <span id="roundDisplay">1</span> / <span id="totalRounds">50</span></div>
                 <div class="timer-box">⏱️ <span>Tempo</span> <span id="timerDisplay">20</span>s</div>
                 <div class="score-box">🏆 <span>Pontos</span> <span id="scoreDisplay">0</span></div>
             </div>
@@ -429,7 +429,7 @@
                     <button class="reset-btn" id="resetBtn">🔄 REINICIAR JOGO</button>
                 </div>
             </div>
-            <footer>🎓 +10 por acerto | 20s por pergunta | A cada acesso as perguntas mudam!</footer>
+            <footer>🎓 +10 por acerto | 20s por pergunta | 50 rodadas | A cada acesso as perguntas mudam!</footer>
         </div>
         <div class="ranking-container">
             <h3>🏅 RANKING (TOP 50)</h3>
@@ -476,12 +476,12 @@
         "análise": { regra: "\"Análise\" deriva do grego 'analysis'. Escreve-se com 's', não com 'z'." }
     };
 
-    // Função para gerar 100 perguntas ALEATÓRIAS
+    // Função para gerar 50 perguntas ALEATÓRIAS
     function gerarBancoPerguntas() {
         const palavras = Object.keys(palavrasComRegras);
         const banco = [];
         
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
             const palavraCorreta = palavras[i % palavras.length];
             const palavraData = palavrasComRegras[palavraCorreta];
             
