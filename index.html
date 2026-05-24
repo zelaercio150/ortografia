@@ -476,7 +476,7 @@
         "análise": { regra: "\"Análise\" deriva do grego 'analysis'. Escreve-se com 's', não com 'z'." }
     };
 
-    // Função para gerar 100 perguntas ALEATÓRIAS (ordem e opções diferentes a cada acesso)
+    // Função para gerar 100 perguntas ALEATÓRIAS
     function gerarBancoPerguntas() {
         const palavras = Object.keys(palavrasComRegras);
         const banco = [];
@@ -485,23 +485,14 @@
             const palavraCorreta = palavras[i % palavras.length];
             const palavraData = palavrasComRegras[palavraCorreta];
             
-            // Gerar 3 erros variados baseados na palavra correta
+            // Gerar 3 erros variados
             const erros = [];
-            // Erro 1: trocar letra comum
-            erros.push(palavraCorreta.replace(/c/g, 'ç').replace(/ss/g, 's').replace(/sc/g, 's').replace(/ç/g, 'c'));
-            // Erro 2: duplicar ou remover letra
-            if (palavraCorreta.length > 5) {
-                erros.push(palavraCorreta.slice(0, -2) + palavraCorreta.slice(-1));
-            } else {
-                erros.push(palavraCorreta + 's');
-            }
-            // Erro 3: trocar 's' por 'z' ou vice-versa
+            erros.push(palavraCorreta.replace(/c/g, 'ç').replace(/ss/g, 's').replace(/sc/g, 's'));
+            erros.push(palavraCorreta.slice(0, -2) + (palavraCorreta.slice(-1) || 'x'));
             erros.push(palavraCorreta.replace(/s/g, 'z').replace(/z/g, 's'));
-            // Erro 4: trocar 'g' por 'j'
             erros.push(palavraCorreta.replace(/g/g, 'j').replace(/j/g, 'g'));
             
-            // Remover duplicatas e garantir que não seja igual à correta
-            const errosUnicos = [...new Set(erros)].filter(e => e !== palavraCorreta).slice(0, 3);
+            const errosUnicos = [...new Set(erros)].filter(e => e !== palavraCorreta && e.length > 3).slice(0, 3);
             while (errosUnicos.length < 3) {
                 errosUnicos.push(palavraCorreta + 'x');
             }
@@ -522,7 +513,7 @@
             });
         }
         
-        // Embaralhar a ordem das perguntas também
+        // Embaralhar a ordem das perguntas
         for (let i = banco.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [banco[i], banco[j]] = [banco[j], banco[i]];
@@ -723,9 +714,7 @@
         answered = true;
         const isCorrect = (selectedWord === currentCorrectAnswer);
         
-        let pontosRodada = 0;
         if (isCorrect) {
-            pontosRodada = 10;
             totalScore += 10;
             scoreDisplaySpan.innerText = totalScore;
             feedbackMsgDiv.innerHTML = `🎉 CORRETO! +10 pontos! Tempo restante: ${timeLeft}s | Pontuação acumulada: ${totalScore} pontos 🎉`;
@@ -735,7 +724,6 @@
             feedbackMsgDiv.style.background = "#ffd1d1";
         }
         
-        // Mostrar explicação
         explanationBox.style.display = "block";
         explanationBox.innerHTML = `<strong>📖 REGRA ORTOGRÁFICA:</strong><br>${currentRegra}`;
         
@@ -784,7 +772,6 @@
     function resetGame() {
         if (!playerData) return;
         stopTimer();
-        // Gerar NOVAS perguntas aleatórias ao reiniciar
         bank = gerarBancoPerguntas();
         totalRoundsSpan.innerText = bank.length;
         totalScore = 0;
@@ -814,4 +801,32 @@
         }
         playerData = { nome, sobrenome, email };
         
-        // GERAR PERGUNTAS ALEATÓRIAS para este
+        bank = gerarBancoPerguntas();
+        totalRoundsSpan.innerText = bank.length;
+        
+        registerScreen.style.display = "none";
+        gameApp.style.display = "block";
+        displayRanking();
+        displayRankingPreview();
+        
+        totalScore = 0;
+        currentRound = 0;
+        answered = false;
+        scoreDisplaySpan.innerText = "0";
+        updateUIStats();
+        loadQuestion();
+        nextBtn.disabled = true;
+        feedbackMsgDiv.innerHTML = "⏳ 20 segundos para responder! Escolha a palavra escrita CORRETAMENTE.";
+        feedbackMsgDiv.style.background = "#eef2f5";
+        if (timerBox) timerBox.classList.remove("urgent");
+        explanationBox.style.display = "none";
+    }
+    
+    startBtn.addEventListener("click", startGameAfterRegister);
+    nextBtn.addEventListener("click", nextRound);
+    resetBtn.addEventListener("click", resetGame);
+    
+    displayRankingPreview();
+</script>
+</body>
+</html>
