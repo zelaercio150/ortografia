@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Desafio de Ortografia - Ranking e Cadastro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1e3c72 0%, #2b4c7c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Tela de cadastro */
+        .register-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .register-card {
+            background: white;
+            max-width: 450px;
+            width: 90%;
+            padding: 35px 28px;
+            border-radius: 48px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .register-card h2 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .register-card input {
+            width: 100%;
+            padding: 14px 18px;
+            margin: 12px 0;
+            border: 2px solid #cfdfed;
+            border-radius: 60px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .register-card input:focus {
+            border-color: #ffb347;
+        }
+
+        .register-card button {
+            background: #ffb347;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .register-card button:active {
+            transform: scale(0.97);
+        }
+
+        .error-msg {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        /* Layout principal com ranking */
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            max-width: 1300px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .game-container {
+            flex: 2;
+            min-width: 300px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .ranking-container {
+            flex: 1;
+            min-width: 260px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 48px;
+            padding: 20px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+            height: fit-content;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .ranking-container h3 {
+            text-align: center;
+            color: #1e3c72;
+            font-size: 1.6rem;
+            margin: 0 0 15px 0;
+            border-bottom: 3px solid #ffb347;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ranking-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 12px;
+            margin: 6px 0;
+            background: #f0f4fa;
+            border-radius: 40px;
+            font-weight: 500;
+            align-items: center;
+        }
+
+        .ranking-list li.top1 {
+            background: gold;
+            color: #2c2b1f;
+        }
+        .ranking-list li.top2 {
+            background: #c0c0c0;
+        }
+        .ranking-list li.top3 {
+            background: #cd7f32;
+            color: white;
+        }
+
+        .rank-position {
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 45px;
+        }
+
+        .rank-name {
+            flex: 2;
+            padding: 0 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rank-score {
+            font-weight: bold;
+            background: #2c5a2e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+
+        .empty-ranking {
+            text-align: center;
+            color: #888;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .header-stats {
+            background: #0f2b3d;
+            padding: 20px 28px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 3px solid #ffcd7e;
+        }
+
+        .score-box, .round-box, .timer-box {
+            background: #00000055;
+            backdrop-filter: blur(4px);
+            padding: 8px 18px;
+            border-radius: 80px;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .timer-box.urgent {
+            background: #c73f1e;
+            animation: pulse 0.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1);}
+            50% { opacity: 0.8; transform: scale(1.02);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+
+        .question-area {
+            padding: 30px 28px 20px;
+        }
+
+        .question-text {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #1f3a4b;
+            margin-bottom: 25px;
+            background: #eef4ff;
+            padding: 18px 20px;
+            border-radius: 36px;
+            text-align: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0 25px;
+        }
+
+        .opt-btn {
+            background: #f7faff;
+            border: 2px solid #cfdfed;
+            border-radius: 60px;
+            padding: 14px 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            background: #fff3da;
+            border-color: #ffbc6e;
+        }
+
+        .opt-btn.correct-highlight {
+            background: #a5d6a5;
+            border-color: #2e6b2e;
+            pointer-events: none;
+        }
+
+        .opt-btn.wrong-highlight {
+            background: #f4acb7;
+            border-color: #a13e4a;
+            text-decoration: line-through;
+            pointer-events: none;
+        }
+
+        .disabled-btn {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 40px;
+        }
+
+        .next-btn {
+            width: 100%;
+            background: #ffb347;
+            border: none;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 14px;
+            border-radius: 60px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .reset-btn {
+            background: #3b5f7a;
+            border: none;
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            background: #e4edf5;
+            padding: 12px;
+        }
+
+        @media (max-width: 850px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="registerScreen" class="register-overlay">
+    <div class="register-card">
+        <h2>📝 Cadastro obrigatório</h2>
+        <p>Identifique-se para jogar e aparecer no ranking!</p>
+        <input type="text" id="firstName" placeholder="Nome *" autocomplete="off">
+        <input type="text" id="lastName" placeholder="Sobrenome *">
+        <input type="email" id="email" placeholder="E-mail *">
+        <button id="startGameBtn">🎮 Começar Desafio</button>
+        <div id="registerError" class="error-msg"></div>
+    </div>
+</div>
+
+<div id="gameApp" style="display: none;">
+    <div class="main-layout">
+        <div class="game-container">
+            <div class="header-stats">
+                <div class="round-box">📖 <span>Rodada</span> <span id="roundDisplay">1</span> / <span id="totalRounds">100</span></div>
+                <div class="timer-box">⏱️ <span>Tempo</span> <span id="timerDisplay">30</span>s</div>
+                <div class="score-box">🏆 <span>Pontos</span> <span id="scoreDisplay">0</span></div>
+            </div>
+            <div class="question-area">
+                <div class="question-text" id="questionText">Carregando pergunta...</div>
+                <div class="options-grid" id="optionsContainer"></div>
+                <div class="feedback" id="feedbackMsg">⏳ Você tem 30 segundos!</div>
+                <button class="next-btn" id="nextBtn">▶ PRÓXIMA RODADA</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="reset-btn" id="resetBtn">🔄 REINICIAR JOGO</button>
+                </div>
+            </div>
+            <footer>🎓 +10 por acerto | 30s por pergunta</footer>
+        </div>
+        <div class="ranking-container">
+            <h3>🏅 RANKING (TOP 50)</h3>
+            <div id="rankingList">
+                <div class="empty-ranking">Carregando ranking...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- PERGUNTAS (ortografia) ----------
+    const errosComuns = {
+        "exceção": ["excessão", "ecceção", "exceção", "exeção"],
+        "concessão": ["conceção", "conssessão", "concessão", "concissão"],
+        "possessivo": ["posessivo", "possessivo", "poseçivo", "poçessivo"],
+        "assessoria": ["assessoria", "asesoria", "aceçoria", "assessória"],
+        "processo": ["proçesso", "processo", "prosesso", "proceço"],
+        "acessório": ["acessório", "acessorio", "acesório", "aceçório"],
+        "necessário": ["necessário", "necesário", "nessessário", "neceçário"],
+        "imprescindível": ["imprecindível", "imprescindível", "imprecissível", "imprescindivell"],
+        "beneficência": ["beneficência", "beneficiencia", "beneficencia", "benefissência"],
+        "ascensão": ["ascenção", "ascensão", "assensão", "ascençãoo"],
+        "consciência": ["consciência", "concência", "conssiência", "consiencia"],
+        "suscetível": ["susceptível", "suscetível", "suscetivel", "suceptível"],
+        "prosseguir": ["proseguir", "prosseguir", "proceguir", "prosseguirr"],
+        "obsessão": ["obceção", "obsessão", "obssessão", "obsessãoo"],
+        "excesso": ["exeço", "excesso", "exesso", "exceço"],
+        "sucessão": ["sucessão", "suceção", "sussessão", "sucessãoo"],
+        "reivindicar": ["reivindicar", "reinvindicar", "reivindicar", "reivindicar"],
+        "preenchimento": ["preenchimento", "prenchimento", "preenchimento", "preenximento"],
+        "mendigo": ["mendingo", "mendigo", "mendigo", "mendigoo"],
+        "preguiça": ["preguiça", "preguissa", "preguiça", "preguiça"],
+        "paralisia": ["paralizia", "paralisia", "paralizia", "paralisia"],
+        "deslize": ["deslise", "deslize", "deslize", "deslisee"],
+        "estrangeiro": ["estrangeiro", "estrangeiro", "estranjeiro", "estrangeiroo"],
+        "milagre": ["milagre", "milagre", "milagre", "milagre"],
+        "cintilante": ["cintilante", "cintilante", "centilante", "cintilante"],
+        "fantasia": ["fantazia", "fantasia", "fantasia", "fantazia"],
+        "assobiar": ["assobiar", "assobiar", "asobiar", "assobiarr"],
+        "privilégio": ["privilégio", "privilégio", "previlégio", "privilégioo"],
+        "vadiagem": ["vadiagem", "vadiagem", "vadiajem", "vadiageem"],
+        "benefício": ["benefício", "benefício", "beneficio", "benefício"],
+        "análise": ["análise", "analise", "analize", "análise"]
+    };
+    
+    const bank = [];
+    const wordsList = Object.keys(errosComuns);
+    for (let i = 0; i < 100; i++) {
+        const baseWord = wordsList[i % wordsList.length];
+        const variants = errosComuns[baseWord];
+        const correctSpelling = baseWord;
+        let wrongs = variants.filter(v => v !== correctSpelling);
+        if (wrongs.length < 3) wrongs = [...wrongs, "grafia incorreta", "ortografia errada"].slice(0,3);
+        let options = [correctSpelling, wrongs[0], wrongs[1], wrongs[2]];
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        bank.push({ id: i+1, question: `📝 Qual palavra está com ERRO? (Correta: "${correctSpelling}")`, options, correct: correctSpelling });
+    }
+    while(bank.length < 100) bank.push({ id: bank.length+1, question: "📝 Qual palavra está com ERRO?", options: ["excessão","exceção","execeção","exeção"], correct: "exceção" });
+    if(bank.length > 100) bank.length = 100;
+    
+    // --- Variáveis globais do jogo ---
+    let currentRound = 0, totalScore = 0, answered = false, timerInterval = null, timeLeft = 30;
+    let currentCorrectAnswer = "", currentOptionsList = [];
+    let playerData = null; // { nome, sobrenome, email }
+    
+    // Elementos DOM
+    const registerScreen = document.getElementById("registerScreen");
+    const gameApp = document.getElementById("gameApp");
+    const startBtn = document.getElementById("startGameBtn");
+    const registerError = document.getElementById("registerError");
+    
+    const roundDisplaySpan = document.getElementById("roundDisplay");
+    const totalRoundsSpan = document.getElementById("totalRounds");
+    const scoreDisplaySpan = document.getElementById("scoreDisplay");
+    const timerDisplaySpan = document.getElementById("timerDisplay");
+    const timerBox = document.querySelector(".timer-box");
+    const questionTextDiv = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const feedbackMsgDiv = document.getElementById("feedbackMsg");
+    const nextBtn = document.getElementById("nextBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const rankingDiv = document.getElementById("rankingList");
+    
+    totalRoundsSpan.innerText = bank.length;
+    
+    // ----- RANKING (localStorage) -----
+    function getRanking() {
+        const stored = localStorage.getItem("orthographyRanking");
+        if (!stored) return [];
+        try {
+            return JSON.parse(stored);
+        } catch(e) { return []; }
+    }
+    
+    function saveRanking(ranking) {
+        localStorage.setItem("orthographyRanking", JSON.stringify(ranking));
+    }
+    
+    function updateRanking(playerName, playerEmail, score) {
+        let ranking = getRanking();
+        // Evitar duplicidade: se o mesmo email já existe, atualiza a maior pontuação
+        const existingIndex = ranking.findIndex(entry => entry.email === playerEmail);
+        if (existingIndex !== -1) {
+            if (score > ranking[existingIndex].score) {
+                ranking[existingIndex].score = score;
+                ranking[existingIndex].name = playerName;
+            }
+        } else {
+            ranking.push({ name: playerName, email: playerEmail, score: score });
+        }
+        // Ordenar do maior score para o menor
+        ranking.sort((a,b) => b.score - a.score);
+        // Manter apenas os 50 melhores
+        if (ranking.length > 50) ranking = ranking.slice(0,50);
+        saveRanking(ranking);
+        displayRanking();
+    }
+    
+    function displayRanking() {
+        const ranking = getRanking();
+        if (!ranking.length) {
+            rankingDiv.innerHTML = '<div class="empty-ranking">📭 Nenhum jogador ainda. Seja o primeiro!</div>';
+            return;
+        }
+        const list = document.createElement("ul");
+        list.className = "ranking-list";
+        ranking.forEach((entry, idx) => {
+            const li = document.createElement("li");
+            if (idx === 0) li.classList.add("top1");
+            else if (idx === 1) li.classList.add("top2");
+            else if (idx === 2) li.classList.add("top3");
+            const positionSpan = document.createElement("span");
+            positionSpan.className = "rank-position";
+            positionSpan.innerText = `${idx+1}º`;
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "rank-name";
+            nameSpan.innerText = entry.name;
+            const scoreSpan = document.createElement("span");
+            scoreSpan.className = "rank-score";
+            scoreSpan.innerText = `${entry.score} pts`;
+            li.appendChild(positionSpan);
+            li.appendChild(nameSpan);
+            li.appendChild(scoreSpan);
+            list.appendChild(li);
+        });
+        rankingDiv.innerHTML = "";
+        rankingDiv.appendChild(list);
+    }
+    
+    // ----- Funções do timer e jogo -----
+    function stopTimer() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        if (timerBox) timerBox.classList.remove("urgent");
+    }
+    
+    function startTimer() {
+        stopTimer();
+        timeLeft = 30;
+        timerDisplaySpan.innerText = timeLeft;
+        if (timerBox) timerBox.classList.remove("urgent");
+        timerInterval = setInterval(() => {
+            if (!answered && timeLeft > 0) {
+                timeLeft--;
+                timerDisplaySpan.innerText = timeLeft;
+                if (timeLeft <= 5 && timerBox) timerBox.classList.add("urgent");
+                if (timeLeft === 0) {
+                    stopTimer();
+                    if (!answered) {
+                        answered = true;
+                        feedbackMsgDiv.innerHTML = `⏰ TEMPO ESGOTADO! A correta era "${currentCorrectAnswer}". +0 pontos.`;
+                        feedbackMsgDiv.style.background = "#ffd1d1";
+                        const allBtns = document.querySelectorAll(".opt-btn");
+                        allBtns.forEach(btn => {
+                            if (btn.innerText === currentCorrectAnswer) btn.classList.add("correct-highlight");
+                            btn.style.pointerEvents = "none";
+                            btn.classList.add("disabled-btn");
+                        });
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = "1";
+                        timerDisplaySpan.innerText = "0";
+                    }
+                }
+            } else if (answered) stopTimer();
+        }, 1000);
+    }
+    
+    function updateUIStats() {
+        roundDisplaySpan.innerText = currentRound + 1;
+        scoreDisplaySpan.innerText = totalScore;
+    }
+    
+    function loadQuestion() {
+        stopTimer();
+        answered = false;
+        const qData = bank[currentRound];
+        questionTextDiv.innerText = qData.question;
+        currentCorrectAnswer = qData.correct;
+        currentOptionsList = [...qData.options];
+        optionsContainer.innerHTML = "";
+        currentOptionsList.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "opt-btn";
+            btn.innerText = opt;
+            btn.addEventListener("click", () => handleAnswer(opt));
+            optionsContainer.appendChild(btn);
+        });
+        feedbackMsgDiv.innerHTML = "⏳ 30 segundos para responder!";
+        feedbackMsgDiv.style.background = "#eef2f5";
+        nextBtn.disabled = true;
+        nextBtn.style.opacity = "0.6";
+        startTimer();
+    }
+    
+    function handleAnswer(selectedWord) {
+        if (answered) {
+            feedbackMsgDiv.innerHTML = "⚠️ Você já respondeu! Clique em PRÓXIMA.";
+            return;
+        }
+        stopTimer();
+        answered = true;
+        const isCorrect = (selectedWord === currentCorrectAnswer);
+        if (isCorrect) {
+            totalScore += 10;
+            scoreDisplaySpan.innerText = totalScore;
+            feedbackMsgDiv.innerHTML = `🎉 CORRETO! +10 pontos! Tempo: ${timeLeft}s restantes 🎉`;
+            feedbackMsgDiv.style.background = "#c8e6c9";
+        } else {
+            feedbackMsgDiv.innerHTML = `❌ ERRADO! A correta é "${currentCorrectAnswer}". +0 pontos. ❌`;
+            feedbackMsgDiv.style.background = "#ffd1d1";
+        }
+        const allBtns = document.querySelectorAll(".opt-btn");
+        allBtns.forEach(btn => {
+            if (btn.innerText === currentCorrectAnswer) btn.classList.add("correct-highlight");
+            if (!isCorrect && btn.innerText === selectedWord && selectedWord !== currentCorrectAnswer) btn.classList.add("wrong-highlight");
+            btn.style.pointerEvents = "none";
+            btn.classList.add("disabled-btn");
+        });
+        nextBtn.disabled = false;
+        nextBtn.style.opacity = "1";
+        timerDisplaySpan.innerText = timeLeft;
+    }
+    
+    function finishGameAndSave() {
+        if (playerData) {
+            const fullName = `${playerData.nome} ${playerData.sobrenome}`;
+            updateRanking(fullName, playerData.email, totalScore);
+        }
+        feedbackMsgDiv.innerHTML = `🏁 FIM! Pontuação final: ${totalScore} pontos. Ranking atualizado! 🏁`;
+        feedbackMsgDiv.style.background = "#ffe0a3";
+        nextBtn.disabled = true;
+        optionsContainer.innerHTML = "<div style='text-align:center; padding:20px'>✨ Jogo finalizado! ✨</div>";
+        questionTextDiv.innerText = "🔠 DESAFIO CONCLUÍDO! 🔠";
+        stopTimer();
+        displayRanking();
+    }
+    
+    function nextRound() {
+        if (!answered) {
+            feedbackMsgDiv.innerHTML = "⚠️ Responda ou aguarde o tempo acabar!";
+            feedbackMsgDiv.style.background = "#fff0b5";
+            return;
+        }
+        if (currentRound + 1 < bank.length) {
+            currentRound++;
+            loadQuestion();
+            updateUIStats();
+        } else {
+            finishGameAndSave();
+        }
+    }
+    
+    function resetGame() {
+        if (!playerData) return;
+        stopTimer();
+        totalScore = 0;
+        currentRound = 0;
+        answered = false;
+        scoreDisplaySpan.innerText = "0";
+        updateUIStats();
+        loadQuestion();
+        nextBtn.disabled = true;
+        feedbackMsgDiv.innerHTML = "🔄 Jogo reiniciado! Boa sorte!";
+        feedbackMsgDiv.style.background = "#eef2f5";
+        if (timerBox) timerBox.classList.remove("urgent");
+    }
+    
+    // ----- Inicialização após cadastro -----
+    function startGameAfterRegister() {
+        const nome = document.getElementById("firstName").value.trim();
+        const sobrenome = document.getElementById("lastName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        if (!nome || !sobrenome || !email) {
+            registerError.innerText = "Preencha todos os campos (nome, sobrenome e e-mail).";
+            return;
+        }
+        if (!email.includes("@") || !email.includes(".")) {
+            registerError.innerText = "E-mail inválido.";
+            return;
+        }
+        playerData = { nome, sobrenome, email };
+        registerScreen.style.display = "none";
+        gameApp.style.display = "block";
+        displayRanking();
+        resetGame();
+    }
+    
+    startBtn.addEventListener("click", startGameAfterRegister);
+    nextBtn.addEventListener("click", nextRound);
+    resetBtn.addEventListener("click", resetGame);
+    
+    // Carregar ranking ao iniciar (escondido)
+    displayRanking();
+</script>
+</body>
+</html>
