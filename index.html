@@ -345,7 +345,7 @@
     <div class="main-layout">
         <div class="game-container">
             <div class="header-stats">
-                <div class="round-box">📖 <span>Rodada</span> <span id="roundDisplay">1</span> / <span id="totalRounds">100</span></div>
+                <div class="round-box">📖 <span>Rodada</span> <span id="roundDisplay">1</span> / <span id="totalRounds">30</span></div>
                 <div class="timer-box">⏱️ <span>Tempo</span> <span id="timerDisplay">30</span>s</div>
                 <div class="score-box">🏆 <span>Pontos</span> <span id="scoreDisplay">0</span></div>
             </div>
@@ -358,7 +358,7 @@
                     <button class="reset-btn" id="resetBtn">🔄 REINICIAR JOGO</button>
                 </div>
             </div>
-            <footer>🎓 +10 por acerto | 30s por pergunta | +200 perguntas aleatórias</footer>
+            <footer>🎓 +10 por acerto | 30s por pergunta | 30 rodadas aleatórias</footer>
         </div>
         <div class="ranking-container">
             <h3>🏅 RANKING (TOP 50)</h3>
@@ -406,24 +406,16 @@
     };
 
     // Converte o objeto em uma lista de palavras (exatamente as 31)
-    const palavrasLista = Object.keys(PALAVRAS_FIXAS); // 31 palavras únicas
+    const palavrasLista = Object.keys(PALAVRAS_FIXAS);
 
-    // Função para gerar UMA pergunta aleatória (embaralha palavra e opções)
+    // Função para gerar UMA pergunta aleatória
     function gerarPerguntaAleatoria() {
-        // Escolhe uma palavra aleatória da lista (pode repetir normalmente)
         const indiceAleatorio = Math.floor(Math.random() * palavrasLista.length);
         const palavraCorreta = palavrasLista[indiceAleatorio];
-        
-        // Pega as variantes (já inclui a correta dentro do array)
         const variantesComCorreta = PALAVRAS_FIXAS[palavraCorreta];
-        
-        // Extrai a versão correta (primeira posição do array original contém a correta)
-        // No nosso dicionário, o array tem a correta + 3 erradas
         let variantes = [...variantesComCorreta];
-        // Garantir que a primeira opção seja a correta (mas vamos embaralhar)
-        // O array original mantém a correta + 3 erradas.
         
-        // Embaralha as opções (assim a posição da correta muda)
+        // Embaralha as opções
         for (let i = variantes.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [variantes[i], variantes[j]] = [variantes[j], variantes[i]];
@@ -436,9 +428,8 @@
         };
     }
 
-    // Gera 200 perguntas aleatórias (garantindo variedade)
-    // Cada jogo terá uma lista diferente e a ordem muda a cada reset / cada usuário
-    function gerarBancoPerguntas(tamanho = 100) {
+    // Gera banco com 30 perguntas aleatórias
+    function gerarBancoPerguntas(tamanho = 30) {
         const banco = [];
         for (let i = 0; i < tamanho; i++) {
             banco.push(gerarPerguntaAleatoria());
@@ -447,7 +438,7 @@
     }
 
     // --- Variáveis globais do jogo ---
-    let bank = [];           // será preenchido aleatoriamente no início do jogo
+    let bank = [];
     let currentRound = 0, totalScore = 0, answered = false, timerInterval = null, timeLeft = 30;
     let currentCorrectAnswer = "", currentOptionsList = [];
     let playerData = null;
@@ -660,15 +651,15 @@
         currentRound = 0;
         answered = false;
         
-        // Gera NOVO banco de perguntas aleatório (ordem totalmente diferente a cada reset)
-        bank = gerarBancoPerguntas(100); // 100 rodadas aleatórias
+        // Gera NOVO banco com 30 perguntas aleatórias
+        bank = gerarBancoPerguntas(30);
         
         totalRoundsSpan.innerText = bank.length;
         scoreDisplaySpan.innerText = "0";
         updateUIStats();
-        loadQuestion(); // carrega a primeira pergunta do novo banco aleatório
+        loadQuestion();
         nextBtn.disabled = true;
-        feedbackMsgDiv.innerHTML = "🔄 Jogo reiniciado! As perguntas foram embaralhadas!";
+        feedbackMsgDiv.innerHTML = "🔄 Jogo reiniciado! 30 novas rodadas embaralhadas!";
         feedbackMsgDiv.style.background = "#eef2f5";
         if (timerBox) timerBox.classList.remove("urgent");
     }
@@ -689,12 +680,12 @@
         registerScreen.style.display = "none";
         gameApp.style.display = "block";
         
-        // Gera banco de perguntas totalmente aleatório (ordem diferente para cada usuário/sessão)
-        bank = gerarBancoPerguntas(100);
+        // Gera banco com 30 perguntas aleatórias
+        bank = gerarBancoPerguntas(30);
         totalRoundsSpan.innerText = bank.length;
         
         displayRanking();
-        resetGame(); // já chama loadQuestion e inicializa tudo
+        resetGame();
     }
     
     startBtn.addEventListener("click", startGameAfterRegister);
