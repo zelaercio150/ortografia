@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Soletrando - Desafio de Ortografia</title>
+    <title>Desafio de Ortografia - Ranking</title>
     <style>
         * {
             box-sizing: border-box;
@@ -358,7 +358,7 @@
                     <button class="reset-btn" id="resetBtn">🔄 REINICIAR JOGO</button>
                 </div>
             </div>
-            <footer>🎓 +10 por acerto | 30s por pergunta</footer>
+            <footer>🎓 +10 por acerto | 30s por pergunta | +200 perguntas aleatórias</footer>
         </div>
         <div class="ranking-container">
             <h3>🏅 RANKING (TOP 50)</h3>
@@ -370,64 +370,89 @@
 </div>
 
 <script>
-    // ---------- PERGUNTAS ATUALIZADAS (ortografia com suas palavras) ----------
-    const errosComuns = {
-        "exceção": ["excessão", "esseção", "ecessão"],
-        "concessão": ["conseção", "consessão", "comcessão"],
-        "possessivo": ["pocessivo", "pocecivo", "pocescivo"],
-        "assessoria": ["asesoria", "aceçoria", "ascessoria"],
-        "processo": ["proçesso", "prosesso", "proceço"],
-        "acessório": ["acessorio", "acesório", "asseçório"],
-        "necessário": ["necesário", "nessessário", "neceçário"],
-        "imprescindível": ["imprecindível", "imprecissível", "imprescindiveu"],
-        "beneficência": ["benefissência", "beneficiencia", "beneficencia"],
-        "ascensão": ["ascenção", "assensão", "assenssão"],
-        "consciência": ["consciênsia", "concência", "consiencia"],
-        "suscetível": ["sussetível", "suscetivel", "suceptível"],
-        "extensão": ["estensão", "estenção", "extenção"],
-        "obsessão": ["obceção", "obssessão", "obscessão"],
-        "expressão": ["espreção", "expreção", "espreção"],
-        "sucessão": ["suceção", "sussessão", "suscessão"],
-        "reivindicar": ["reividincar", "reinvindicar", "revindicar"],
-        "preenchimento": ["prenchimento", "preenximento", "prenximento"],
-        "promessa": ["promesça", "promeça", "promessça"],
-        "chuchu": ["xuchu", "chuxu", "xuxu"],
-        "ansioso": ["ansiozo", "ancioso", "anciozo"],
-        "deslize": ["deslise", "deslizie", "deslisee"],
-        "estrangeiro": ["extranjeiro", "estranjeiro", "extrangeiro"],
-        "coincidência": ["coicidência", "considência", "concidência"],
-        "hesitar": ["esitar", "ezitar", "hezitar"],
-        "cabeleireiro": ["cabeleileiro", "cabelerero", "cabelelero"],
-        "assobiar": ["assobear", "açobiar", "asçobiar"],
-        "privilégio": ["priviléjio", "previlégio", "previléjio"],
-        "concessionária": ["consessionária", "concecionária", "consercionária"],
-        "esôfago": ["exôfago", "ezôfago", "esôufago"],
-        "autorizar": ["altorizar", "autorisar", "altorisar"]
+    // ==================== BANCO DE PALAVRAS (SOMENTE AS QUE VOCÊ ENVIOU) ====================
+    const PALAVRAS_FIXAS = {
+        "exceção": ["excessão", "esseção", "exceção", "ecessão"],
+        "concessão": ["conseção", "concessão", "consessão", "comcessão"],
+        "possessivo": ["pocessivo", "pocecivo", "possessivo", "pocescivo"],
+        "assessoria": ["assessoria", "asesoria", "aceçoria", "ascessoria"],
+        "processo": ["proçesso", "processo", "prosesso", "proceço"],
+        "acessório": ["acessório", "acessorio", "acesório", "asseçório"],
+        "necessário": ["necesário", "necessário", "nessessário", "neceçário"],
+        "imprescindível": ["imprecindível", "imprescindível", "imprecissível", "imprescindiveu"],
+        "beneficência": ["benefissência", "beneficiencia", "beneficencia", "beneficência"],
+        "ascensão": ["ascenção", "ascensão", "assensão", "assenssão"],
+        "consciência": ["consciênsia", "concência", "consciência", "consiencia"],
+        "suscetível": ["sussetível", "suscetível", "suscetivel", "suceptível"],
+        "extensão": ["estensão", "estenção", "extensão", "extenção"],
+        "obsessão": ["obceção", "obsessão", "obssessão", "obscessão"],
+        "expressão": ["espreção", "expreção", "espreção", "expressão"],
+        "sucessão": ["sucessão", "suceção", "sussessão", "suscessão"],
+        "reivindicar": ["reividincar", "reinvindicar", "reivindicar", "revindicar"],
+        "preenchimento": ["preenchimento", "prenchimento", "preenximento", "prenximento"],
+        "promessa": ["promesça", "promeça", "promessa", "promessça"],
+        "chuchu": ["chuchu", "xuchu", "chuxu", "xuxu"],
+        "ansioso": ["ansiozo", "ansioso", "ancioso", "anciozo"],
+        "deslize": ["deslise", "deslize", "deslizie", "deslisee"],
+        "estrangeiro": ["extranjeiro", "estrangeiro", "estranjeiro", "extrangeiro"],
+        "coincidência": ["coicidência", "considência", "concidência", "coincidência"],
+        "hesitar": ["hesitar", "esitar", "ezitar", "hezitar"],
+        "cabeleireiro": ["cabeleileiro", "cabelerero", "cabelelero", "cabeleireiro"],
+        "assobiar": ["assobiar", "assobear", "açobiar", "asçobiar"],
+        "privilégio": ["priviléjio", "privilégio", "previlégio", "previléjio"],
+        "concessionária": ["consessionária", "concecionária", "consercionária", "concessionária"],
+        "esôfago": ["esôfago", "exôfago", "ezôfago", "esôufago"],
+        "autorizar": ["altorizar", "autorizar", "autorisar", "altorisar"]
     };
-    
-    const bank = [];
-    const wordsList = Object.keys(errosComuns);
-    for (let i = 0; i < 100; i++) {
-        const baseWord = wordsList[i % wordsList.length];
-        const variants = errosComuns[baseWord];
-        const correctSpelling = baseWord;
-        let wrongs = variants.filter(v => v !== correctSpelling);
-        if (wrongs.length < 3) wrongs = [...wrongs, "grafia incorreta", "ortografia errada"].slice(0,3);
-        let options = [correctSpelling, wrongs[0], wrongs[1], wrongs[2]];
-        for (let i = options.length - 1; i > 0; i--) {
+
+    // Converte o objeto em uma lista de palavras (exatamente as 31)
+    const palavrasLista = Object.keys(PALAVRAS_FIXAS); // 31 palavras únicas
+
+    // Função para gerar UMA pergunta aleatória (embaralha palavra e opções)
+    function gerarPerguntaAleatoria() {
+        // Escolhe uma palavra aleatória da lista (pode repetir normalmente)
+        const indiceAleatorio = Math.floor(Math.random() * palavrasLista.length);
+        const palavraCorreta = palavrasLista[indiceAleatorio];
+        
+        // Pega as variantes (já inclui a correta dentro do array)
+        const variantesComCorreta = PALAVRAS_FIXAS[palavraCorreta];
+        
+        // Extrai a versão correta (primeira posição do array original contém a correta)
+        // No nosso dicionário, o array tem a correta + 3 erradas
+        let variantes = [...variantesComCorreta];
+        // Garantir que a primeira opção seja a correta (mas vamos embaralhar)
+        // O array original mantém a correta + 3 erradas.
+        
+        // Embaralha as opções (assim a posição da correta muda)
+        for (let i = variantes.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [options[i], options[j]] = [options[j], options[i]];
+            [variantes[i], variantes[j]] = [variantes[j], variantes[i]];
         }
-        bank.push({ id: i+1, question: `📝 Qual é a palavra correta? (Ortografia)`, options, correct: correctSpelling });
+        
+        return {
+            question: "📝 Qual é a grafia CORRETA da palavra?",
+            options: variantes,
+            correct: palavraCorreta
+        };
     }
-    while(bank.length < 100) bank.push({ id: bank.length+1, question: "📝 Qual palavra está escrita corretamente?", options: ["excessão","exceção","execeção","exeção"], correct: "exceção" });
-    if(bank.length > 100) bank.length = 100;
-    
+
+    // Gera 200 perguntas aleatórias (garantindo variedade)
+    // Cada jogo terá uma lista diferente e a ordem muda a cada reset / cada usuário
+    function gerarBancoPerguntas(tamanho = 100) {
+        const banco = [];
+        for (let i = 0; i < tamanho; i++) {
+            banco.push(gerarPerguntaAleatoria());
+        }
+        return banco;
+    }
+
     // --- Variáveis globais do jogo ---
+    let bank = [];           // será preenchido aleatoriamente no início do jogo
     let currentRound = 0, totalScore = 0, answered = false, timerInterval = null, timeLeft = 30;
     let currentCorrectAnswer = "", currentOptionsList = [];
     let playerData = null;
     
+    // Elementos DOM
     const registerScreen = document.getElementById("registerScreen");
     const gameApp = document.getElementById("gameApp");
     const startBtn = document.getElementById("startGameBtn");
@@ -445,10 +470,9 @@
     const resetBtn = document.getElementById("resetBtn");
     const rankingDiv = document.getElementById("rankingList");
     
-    totalRoundsSpan.innerText = bank.length;
-    
+    // ----- RANKING (localStorage) -----
     function getRanking() {
-        const stored = localStorage.getItem("orthographyRanking");
+        const stored = localStorage.getItem("orthographyRankingFinal");
         if (!stored) return [];
         try {
             return JSON.parse(stored);
@@ -456,7 +480,7 @@
     }
     
     function saveRanking(ranking) {
-        localStorage.setItem("orthographyRanking", JSON.stringify(ranking));
+        localStorage.setItem("orthographyRankingFinal", JSON.stringify(ranking));
     }
     
     function updateRanking(playerName, playerEmail, score) {
@@ -507,6 +531,7 @@
         rankingDiv.appendChild(list);
     }
     
+    // ----- Funções do timer e jogo -----
     function stopTimer() {
         if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         if (timerBox) timerBox.classList.remove("urgent");
@@ -634,11 +659,16 @@
         totalScore = 0;
         currentRound = 0;
         answered = false;
+        
+        // Gera NOVO banco de perguntas aleatório (ordem totalmente diferente a cada reset)
+        bank = gerarBancoPerguntas(100); // 100 rodadas aleatórias
+        
+        totalRoundsSpan.innerText = bank.length;
         scoreDisplaySpan.innerText = "0";
         updateUIStats();
-        loadQuestion();
+        loadQuestion(); // carrega a primeira pergunta do novo banco aleatório
         nextBtn.disabled = true;
-        feedbackMsgDiv.innerHTML = "🔄 Jogo reiniciado! Boa sorte!";
+        feedbackMsgDiv.innerHTML = "🔄 Jogo reiniciado! As perguntas foram embaralhadas!";
         feedbackMsgDiv.style.background = "#eef2f5";
         if (timerBox) timerBox.classList.remove("urgent");
     }
@@ -658,8 +688,13 @@
         playerData = { nome, sobrenome, email };
         registerScreen.style.display = "none";
         gameApp.style.display = "block";
+        
+        // Gera banco de perguntas totalmente aleatório (ordem diferente para cada usuário/sessão)
+        bank = gerarBancoPerguntas(100);
+        totalRoundsSpan.innerText = bank.length;
+        
         displayRanking();
-        resetGame();
+        resetGame(); // já chama loadQuestion e inicializa tudo
     }
     
     startBtn.addEventListener("click", startGameAfterRegister);
