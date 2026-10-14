@@ -4,1113 +4,926 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎧 Ouça e Soletre – 3 Fases</title>
+  <title>Ouça &amp; Soletre – 3 Fases</title>
 
   <style>
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(145deg, #0d1b2a 0%, #1b2f4a 100%);
+      margin: 0;
+      padding: 20px;
       min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #172554, #2563eb);
+      color: #1e293b;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 16px;
+      align-items: center;
     }
 
-    .game-card {
-      max-width: 800px;
+    .container {
       width: 100%;
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 40px;
-      padding: 24px 22px 20px;
-      box-shadow: 0 30px 50px -12px rgba(0,0,0,0.8);
-      border: 1px solid rgba(255,255,255,0.05);
+      max-width: 720px;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+      text-align: center;
     }
 
     h1 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
+      margin-top: 0;
+      color: #1d4ed8;
       font-size: 2rem;
-      color: #f2e9d0;
-      margin-bottom: 4px;
-      flex-wrap: wrap;
     }
 
-    h1 span {
-      background: #f7c948;
-      color: #1b2a49;
-      font-size: 1.7rem;
-      padding: 0 16px;
-      border-radius: 60px;
+    h2 {
+      color: #1e40af;
     }
 
-    .subhead {
-      text-align: center;
-      color: #b6c9e8;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-      border-bottom: 1px dashed rgba(255,215,100,0.2);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
+    .subtitle {
+      color: #475569;
+      line-height: 1.6;
     }
 
-    .top-stats {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: rgba(10,20,40,0.5);
-      border-radius: 30px;
-      padding: 8px 12px;
-      margin-bottom: 14px;
-      border: 1px solid rgba(255,215,100,0.15);
+    .hidden {
+      display: none !important;
     }
 
-    .phase-badge {
-      background: #2a3f5e;
-      padding: 6px 14px;
-      border-radius: 60px;
-      font-weight: 700;
-      color: #f7c948;
+    .form-group {
+      margin: 22px 0;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
       font-size: 1rem;
-      border: 2px solid #f7c948;
     }
 
-    .score-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #101c30;
-      padding: 4px 14px;
-      border-radius: 60px;
-      border: 2px solid #ffe484;
+    input:focus {
+      outline: 2px solid #60a5fa;
+      border-color: #2563eb;
     }
 
-    .score-box span {
-      color: #ffe484;
-      font-weight: 700;
-    }
-
-    .score-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #ffe484;
-      min-width: 2.2rem;
-      text-align: center;
-    }
-
-    .progress-fase {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #0f1c30;
-      padding: 4px 14px;
-      border-radius: 60px;
-      border: 2px solid #6fbf6f;
-    }
-
-    .progress-fase span,
-    .progress-fase strong {
-      color: #6fbf6f;
-      font-weight: 700;
-    }
-
-    .progress-fase strong {
-      font-size: 1.2rem;
-    }
-
-    .timer-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #0f1c30;
-      padding: 4px 12px;
-      border-radius: 60px;
-      border: 2px solid #5e7bb3;
-    }
-
-    .timer-container span {
-      color: #8ba9dc;
-      font-weight: 700;
-    }
-
-    .timer-display {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #8ba9dc;
-      min-width: 2rem;
-      text-align: center;
-      font-family: 'Courier New', monospace;
-    }
-
-    .timer-display.warning {
-      color: #ff6b6b;
-      animation: pulse 0.5s ease-in-out infinite alternate;
-    }
-
-    .timer-display.idle {
-      color: #5d7499;
-    }
-
-    @keyframes pulse {
-      from { opacity: 1; }
-      to { opacity: 0.5; }
-    }
-
-    .word-box {
-      display: none;
-    }
-
-    .listen-hint {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 10px 0 14px;
-    }
-
-    .btn-listen {
-      background: #1f334f;
-      border-radius: 60px;
-      padding: 14px 32px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #f0e9d0;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
+    button {
+      padding: 13px 20px;
+      margin: 6px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 6px 0 #0b1422;
-      border: 2px solid #5e78a0;
-      transition: 0.15s;
+      transition: transform 0.15s, opacity 0.15s;
     }
 
-    .btn-listen:hover {
-      background: #2a4062;
-    }
-
-    .btn-listen:active {
-      transform: translateY(3px);
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
     }
 
     button:disabled {
-      opacity: 0.45;
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .input-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0 6px;
-    }
-
-    #palavraInput {
-      width: 100%;
-      max-width: 420px;
-      padding: 14px 20px;
-      border-radius: 60px;
-      border: 2px solid #3d5a7a;
-      background: #0a1628;
+    .primary {
       color: white;
-      font-size: 1.3rem;
-      letter-spacing: 2px;
-      text-align: center;
-      outline: none;
-      font-family: 'Courier New', monospace;
+      background: #2563eb;
     }
 
-    #palavraInput:focus {
-      border-color: #f7c948;
-      background: #0f1f38;
+    .success {
+      color: white;
+      background: #15803d;
     }
 
-    #palavraInput::placeholder {
-      color: #5d7499;
-      font-size: 1rem;
+    .secondary {
+      color: white;
+      background: #475569;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .btn-primary {
-      background: #f7c948;
-      border-radius: 60px;
-      padding: 11px 28px;
-      font-weight: 700;
+    .audio {
+      color: white;
+      background: #7c3aed;
       font-size: 1.1rem;
-      color: #141f33;
-      box-shadow: 0 6px 0 #a57c2a;
-      cursor: pointer;
-      border: 1px solid #ffe28a;
     }
 
-    .btn-primary:hover {
-      background: #ffd966;
+    .student-info {
+      margin: 15px 0;
+      padding: 12px;
+      background: #eff6ff;
+      border-radius: 10px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
     }
 
-    .btn-secondary {
-      background: #2f405e;
-      border-radius: 60px;
-      padding: 11px 24px;
-      font-weight: 600;
-      font-size: 1rem;
-      color: #d6e2ff;
-      box-shadow: 0 6px 0 #192234;
-      cursor: pointer;
-      border: 1px solid #556f94;
+    .progress-area {
+      margin: 20px 0;
     }
 
-    .btn-secondary:hover {
-      background: #3c5277;
-      color: white;
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      overflow: hidden;
+      background: #e2e8f0;
+      border-radius: 20px;
     }
 
-    .feedback {
-      min-height: 3rem;
-      margin: 12px 0 4px;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 30px;
-      background: rgba(0,0,0,0.3);
-      padding: 8px 14px;
-      color: #cddefa;
-      border: 1px solid #43587a;
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: #2563eb;
+      transition: width 0.25s;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .stat {
+      padding: 14px 6px;
+      background: #f1f5f9;
+      border-radius: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.4rem;
+      color: #1d4ed8;
+    }
+
+    .timer {
+      margin: 20px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    #timeLeft {
+      color: #dc2626;
+      font-size: 1.5rem;
+    }
+
+    .answer-area {
+      margin: 20px 0;
+    }
+
+    #answerInput {
       text-align: center;
+      font-size: 1.2rem;
     }
 
-    .feedback.acerto {
-      background: #1f4d2ecc;
-      color: #b3f0b3;
-      border-color: #6fbf6f;
+    #feedback {
+      min-height: 50px;
+      margin: 15px 0;
+      font-size: 1.05rem;
+      font-weight: bold;
+      line-height: 1.5;
     }
 
-    .feedback.erro {
-      background: #4d2525cc;
-      color: #ffbaba;
-      border-color: #bf6f6f;
+    .feedback-correct {
+      color: #15803d;
     }
 
-    .feedback.fim {
-      background: #1f3d5ccc;
-      color: #d4e6ff;
-      border-color: #7a9fd4;
+    .feedback-wrong {
+      color: #b91c1c;
     }
 
-    .feedback.tempo {
-      background: #5a3d1fcc;
-      color: #ffd99b;
-      border-color: #bf8f4f;
+    .feedback-neutral {
+      color: #475569;
     }
 
-    .footer-credits {
-      text-align: center;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255,215,100,0.15);
-      color: #7a8fa8;
-      font-size: 0.8rem;
+    .phase-label {
+      display: inline-block;
+      padding: 8px 15px;
+      margin: 5px;
+      border-radius: 20px;
+      color: #1e40af;
+      background: #dbeafe;
+      font-weight: bold;
     }
 
-    .footer-credits span {
-      color: #f7c948;
+    .final-score {
+      padding: 20px;
+      margin: 20px 0;
+      background: #eff6ff;
+      border-radius: 12px;
+      line-height: 1.8;
     }
 
-    @media (max-width: 600px) {
-      .game-card {
-        padding: 16px 12px;
-        border-radius: 28px;
+    .instructions {
+      padding: 15px;
+      margin-top: 20px;
+      text-align: left;
+      line-height: 1.7;
+      background: #f8fafc;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 20px 14px;
       }
 
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
       }
 
-      h1 span {
-        font-size: 1.3rem;
+      .stats {
+        gap: 5px;
       }
 
-      .top-stats {
-        flex-direction: column;
-        align-items: stretch;
+      .stat {
+        font-size: 0.85rem;
       }
 
-      .phase-badge,
-      .score-box,
-      .progress-fase,
-      .timer-container {
-        justify-content: center;
-      }
-
-      .btn-listen {
-        padding: 12px 22px;
-        font-size: 1rem;
-      }
-
-      #palavraInput {
-        font-size: 1.1rem;
-      }
-
-      .btn-primary,
-      .btn-secondary {
-        padding: 10px 18px;
-        font-size: 0.95rem;
+      button {
+        padding: 12px 14px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="game-card">
+  <main class="container">
 
-    <h1><span>🎧</span> Ouça &amp; Soletre</h1>
+    <!-- TELA INICIAL -->
+    <section id="startScreen">
+      <h1>🔊 Ouça &amp; Soletre</h1>
+      <p class="subtitle">
+        Um desafio de ortografia dividido em três fases.
+        Escute a palavra e escreva-a corretamente!
+      </p>
 
-    <div class="subhead">
-      ⭐ 3 fases • palavras médias e difíceis
-    </div>
-
-    <div class="top-stats">
-      <div class="phase-badge" id="faseBadge">🌙 Fase 1</div>
-
-      <div class="score-box">
-        <span>🏆</span>
-        <span class="score-value" id="scoreDisplay">0</span>
+      <div class="form-group">
+        <label for="studentName">Nome completo do aluno:</label>
+        <input
+          type="text"
+          id="studentName"
+          placeholder="Digite seu nome"
+          autocomplete="name"
+          maxlength="100"
+          required
+        >
       </div>
 
-      <div class="progress-fase">
-        <span>📊</span>
-        <strong id="progressText">0/30</strong>
+      <div class="form-group">
+        <label for="studentSeries">Série / Turma:</label>
+        <input
+          type="text"
+          id="studentSeries"
+          placeholder="Ex.: 1ª série A"
+          maxlength="40"
+          required
+        >
       </div>
 
-      <div class="timer-container">
-        <span>⏱️</span>
-        <span class="timer-display idle" id="timerDisplay">10</span>
-        <span>s</span>
-      </div>
-    </div>
-
-    <div class="listen-hint">
-      <button class="btn-listen" id="listenBtn">
-        <span>🔊</span> Ouvir palavra
+      <button class="primary" id="continueButton">
+        CONTINUAR
       </button>
-    </div>
 
-    <div class="input-area">
-      <input
-        type="text"
-        id="palavraInput"
-        placeholder="Digite a palavra..."
-        autocomplete="off"
-        disabled
-      >
+      <div class="instructions">
+        <strong>Como jogar:</strong>
+        <ol>
+          <li>Informe seu nome e sua série.</li>
+          <li>Clique em “Ouvir palavra”.</li>
+          <li>Digite a palavra que escutou.</li>
+          <li>Clique em “Verificar resposta”.</li>
+          <li>Você terá 10 segundos para responder após o áudio.</li>
+          <li>Conclua as três fases para ver seu resultado.</li>
+        </ol>
+      </div>
+    </section>
 
-      <div class="actions">
-        <button class="btn-primary" id="checkBtn" disabled>
-          ✓ Verificar
+    <!-- TELA DO JOGO -->
+    <section id="gameScreen" class="hidden">
+      <h1>🔊 Ouça &amp; Soletre</h1>
+
+      <div class="student-info">
+        <div><strong>Aluno:</strong> <span id="displayName"></span></div>
+        <div><strong>Série:</strong> <span id="displaySeries"></span></div>
+      </div>
+
+      <div>
+        <span class="phase-label" id="phaseLabel">1ª FASE</span>
+        <p id="phaseDescription">Fase 1 de 3</p>
+      </div>
+
+      <div class="progress-area">
+        <div id="progressText">Palavra 1 de 25</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          Pontos da fase
+          <strong id="phaseScore">0</strong>
+        </div>
+        <div class="stat">
+          Acertos
+          <strong id="correctCount">0</strong>
+        </div>
+        <div class="stat">
+          Total de palavras
+          <strong id="totalCount">71</strong>
+        </div>
+      </div>
+
+      <button class="audio" id="listenButton">
+        🔊 Ouvir palavra
+      </button>
+
+      <div class="timer">
+        Tempo restante: <span id="timeLeft">10</span>s
+      </div>
+
+      <div class="answer-area">
+        <label for="answerInput">Digite a palavra que você ouviu:</label>
+        <input
+          type="text"
+          id="answerInput"
+          placeholder="Escreva aqui..."
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          disabled
+        >
+      </div>
+
+      <div id="feedback" class="feedback-neutral" aria-live="polite">
+        Clique em “Ouvir palavra” para começar.
+      </div>
+
+      <div>
+        <button class="primary" id="checkButton" disabled>
+          Verificar resposta
         </button>
 
-        <button class="btn-secondary" id="nextBtn">
-          ↺ Próxima
+        <button class="success hidden" id="nextButton">
+          Próxima palavra
         </button>
       </div>
-    </div>
+    </section>
 
-    <div class="feedback" id="feedbackMessage">
-      💡 Clique em "Ouvir palavra"
-    </div>
+    <!-- RESULTADO FINAL -->
+    <section id="resultScreen" class="hidden">
+      <h1>🏆 Resultado final</h1>
 
-    <div class="footer-credits">
-      Site desenvolvido por <span>Laércio Torquato</span>
-    </div>
+      <div class="student-info">
+        <div><strong>Aluno:</strong> <span id="resultName"></span></div>
+        <div><strong>Série:</strong> <span id="resultSeries"></span></div>
+      </div>
 
-  </div>
+      <div class="final-score" id="finalScore"></div>
+
+      <p id="finalMessage"></p>
+
+      <p class="subtitle">
+        Parabéns por concluir o desafio!
+      </p>
+    </section>
+
+  </main>
 
   <script>
-    (() => {
-      // =========================================
-      // BANCO DE PALAVRAS
-      // =========================================
+    // =====================================================
+    // BANCO DE PALAVRAS
+    // 1ª fase: 25 palavras
+    // 2ª fase: 25 palavras
+    // 3ª fase: 21 palavras
+    // =====================================================
 
-      const WORD_POOL = [
+    const FASES = [
+      [
         "razoável", "garçom", "açougue", "exceção", "extinção",
         "hipótese", "sensação", "experimentar", "decisão", "interesse",
         "faxina", "espichar", "hospedar", "hesitar", "posse",
         "versão", "enxergar", "colchão", "chacoalhar", "incandescer",
-        "atravessar", "superstição", "sentar", "cochichar", "cochilar",
+        "atravessar", "superstição", "sentar", "cochichar", "cochilar"
+      ],
+      [
         "capricho", "puxar", "anestesia", "consciente", "compressor",
         "extensão", "convenção", "ranzinza", "persuasão", "rabicho",
         "expertise", "hematoma", "agasalho", "fluorescente", "vexame",
         "obsceno", "anseio", "grosseiro", "excitar", "similar",
-        "enxurrada", "inexorável", "admirar", "sinestesia", "exaurir",
+        "enxurrada", "inexorável", "admirar", "sinestesia", "exaurir"
+      ],
+      [
         "reminiscência", "excrescência", "discrepância", "interstício",
         "extravasar", "extrair", "excêntrico", "ascensão",
         "discernimento", "fascinado", "perspicaz", "rescisão",
         "imprescindível", "sensibilizar", "expressivo", "fracasso",
-        "esporádico", "exagerado", "demasiado", "disseminar",
-        "exasperar", "assédio"
-      ];
+        "esporádico", "disseminar", "exasperar", "obsceno", "assédio"
+      ]
+    ];
 
-      // =========================================
-      // CONFIGURAÇÃO DAS FASES
-      // =========================================
+    // Metas proporcionais à quantidade de palavras por fase.
+    const METAS = [20, 20, 17];
+    const TEMPO_POR_PALAVRA = 10;
 
-      const PHASES = [
-        { fase: 1, palavras: 30, meta: 20, label: "🌙 Fase 1" },
-        { fase: 2, palavras: 30, meta: 20, label: "🌞 Fase 2" },
-        { fase: 3, palavras: 30, meta: 25, label: "🌟 Fase 3" }
-      ];
+    // =====================================================
+    // ELEMENTOS DA PÁGINA
+    // =====================================================
 
-      const TEMPO_LIMITE = 10;
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
 
-      // =========================================
-      // ESTADO DO JOGO
-      // =========================================
+    const studentNameInput = document.getElementById("studentName");
+    const studentSeriesInput = document.getElementById("studentSeries");
 
-      let currentPhaseIndex = 0;
-      let currentWordList = [];
-      let currentWordIndex = 0;
-      let score = 0;
-      let totalAttempted = 0;
-      let isAnswered = false;
-      let isListening = false;
-      let gameFinished = false;
-      let timerInterval = null;
-      let timeLeft = TEMPO_LIMITE;
-      let timerStarted = false;
-      let speechRequestId = 0;
-      let advanceTimeout = null;
+    const continueButton = document.getElementById("continueButton");
+    const listenButton = document.getElementById("listenButton");
+    const checkButton = document.getElementById("checkButton");
+    const nextButton = document.getElementById("nextButton");
+    const answerInput = document.getElementById("answerInput");
 
-      // =========================================
-      // ELEMENTOS DA INTERFACE
-      // =========================================
+    const phaseLabel = document.getElementById("phaseLabel");
+    const phaseDescription = document.getElementById("phaseDescription");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const phaseScoreElement = document.getElementById("phaseScore");
+    const correctCountElement = document.getElementById("correctCount");
+    const totalCountElement = document.getElementById("totalCount");
+    const timeLeftElement = document.getElementById("timeLeft");
+    const feedback = document.getElementById("feedback");
 
-      const scoreDisplay = document.getElementById("scoreDisplay");
-      const faseBadge = document.getElementById("faseBadge");
-      const progressText = document.getElementById("progressText");
-      const palavraInput = document.getElementById("palavraInput");
-      const checkBtn = document.getElementById("checkBtn");
-      const nextBtn = document.getElementById("nextBtn");
-      const listenBtn = document.getElementById("listenBtn");
-      const feedbackEl = document.getElementById("feedbackMessage");
-      const timerDisplay = document.getElementById("timerDisplay");
+    // =====================================================
+    // ESTADO DO JOGO
+    // =====================================================
 
-      // =========================================
-      // FEEDBACK
-      // =========================================
+    let studentName = "";
+    let studentSeries = "";
 
-      function setFeedback(message, type = "info") {
-        feedbackEl.textContent = message;
-        feedbackEl.className = "feedback";
+    let phaseIndex = 0;
+    let wordIndex = 0;
+    let phaseScore = 0;
+    let totalCorrect = 0;
+    let totalAnswered = 0;
 
-        if (type === "acerto") {
-          feedbackEl.classList.add("acerto");
-        } else if (type === "erro") {
-          feedbackEl.classList.add("erro");
-        } else if (type === "fim") {
-          feedbackEl.classList.add("fim");
-        } else if (type === "tempo") {
-          feedbackEl.classList.add("tempo");
-        }
+    let secondsLeft = TEMPO_POR_PALAVRA;
+    let timerId = null;
+    let isAnswered = false;
+    let isSpeaking = false;
+    let gameFinished = false;
+    let speechRequestId = 0;
+
+    const totalWords = FASES.reduce(
+      (sum, phase) => sum + phase.length,
+      0
+    );
+
+    totalCountElement.textContent = totalWords;
+
+    // =====================================================
+    // TELA INICIAL
+    // =====================================================
+
+    continueButton.addEventListener("click", () => {
+      studentName = studentNameInput.value.trim();
+      studentSeries = studentSeriesInput.value.trim();
+
+      if (!studentName || !studentSeries) {
+        alert("Preencha seu nome e sua série antes de continuar.");
+        return;
       }
 
-      // =========================================
-      // FUNÇÕES AUXILIARES
-      // =========================================
+      document.getElementById("displayName").textContent = studentName;
+      document.getElementById("displaySeries").textContent = studentSeries;
 
-      function normalizeText(text) {
-        return text
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toLowerCase()
-          .trim();
-      }
+      startScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
 
-      function shuffleArray(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
+      loadWord();
+    });
 
-        return arr;
-      }
-
-      function generateWordListForPhase(phaseIndex) {
-        const shuffled = shuffleArray([...WORD_POOL]);
-        const count = PHASES[phaseIndex].palavras;
-
-        while (shuffled.length < count) {
-          shuffled.push(...shuffleArray([...WORD_POOL]));
-        }
-
-        return shuffled.slice(0, count);
-      }
-
-      // =========================================
-      // CRONÔMETRO
-      // =========================================
-
-      function clearTimer() {
-        if (timerInterval !== null) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-
-        timerDisplay.classList.remove("warning");
-      }
-
-      function updateTimerDisplay() {
-        timerDisplay.textContent = timeLeft;
-      }
-
-      function resetTimer() {
-        clearTimer();
-
-        timeLeft = TEMPO_LIMITE;
-        timerStarted = false;
-
-        updateTimerDisplay();
-
-        timerDisplay.classList.remove("warning");
-        timerDisplay.classList.add("idle");
-      }
-
-      function startTimer() {
-        if (gameFinished || isAnswered || timerInterval !== null) {
-          return;
-        }
-
-        if (timeLeft <= 0) {
-          timeLeft = TEMPO_LIMITE;
-        }
-
-        timerStarted = true;
-        timerDisplay.classList.remove("idle");
-
-        updateTimerDisplay();
-
-        timerInterval = setInterval(() => {
-          if (gameFinished || isAnswered) {
-            clearTimer();
-            return;
-          }
-
-          // O tempo não é consumido enquanto o áudio toca.
-          if (isListening) {
-            return;
-          }
-
-          timeLeft--;
-          updateTimerDisplay();
-
-          if (timeLeft <= 3) {
-            timerDisplay.classList.add("warning");
-          }
-
-          if (timeLeft <= 0) {
-            clearTimer();
-            handleTimeout();
-          }
-        }, 1000);
-      }
-
-      function stopTimer() {
-        clearTimer();
-      }
-
-      // =========================================
-      // ÁUDIO: PRONÚNCIA DA PALAVRA SELECIONADA
-      // =========================================
-
-      function handleListen() {
-        if (gameFinished) {
-          setFeedback("🏁 Jogo finalizado.", "fim");
-          return;
-        }
-
-        if (isAnswered) {
-          setFeedback("✅ Você já respondeu esta palavra.", "info");
-          return;
-        }
-
-        if (isListening) {
-          setFeedback("⏳ Aguarde o áudio terminar.", "info");
-          return;
-        }
-
-        if (
-          !currentWordList.length ||
-          currentWordIndex >= currentWordList.length
-        ) {
-          setFeedback("⚠️ Nenhuma palavra disponível.", "erro");
-          return;
-        }
-
-        const word = currentWordList[currentWordIndex];
-
-        if (!word) {
-          setFeedback("⚠️ Não foi possível carregar a palavra.", "erro");
-          return;
-        }
-
-        if (!("speechSynthesis" in window)) {
-          setFeedback(
-            "❌ Seu navegador não suporta a reprodução de áudio.",
-            "erro"
-          );
-          return;
-        }
-
-        speakWord(word);
-      }
-
-      function speakWord(word) {
-        // Identificador para impedir que áudios antigos interfiram
-        // na palavra atual.
-        const requestId = ++speechRequestId;
-
-        window.speechSynthesis.cancel();
-
-        isListening = true;
-        listenBtn.disabled = true;
-        palavraInput.disabled = true;
-        checkBtn.disabled = true;
-
-        setFeedback("🔊 Preparando o áudio...", "info");
-
-        // Aguarda o cancelamento da fala anterior.
-        setTimeout(() => {
-          if (requestId !== speechRequestId) {
-            return;
-          }
-
-          if (gameFinished || isAnswered) {
-            isListening = false;
-            listenBtn.disabled = gameFinished || isAnswered;
-            return;
-          }
-
-          const utterance = new SpeechSynthesisUtterance(word);
-
-          // A palavra enviada ao sintetizador é exatamente a do banco.
-          utterance.text = word;
-          utterance.lang = "pt-BR";
-          utterance.rate = 0.75;
-          utterance.pitch = 1;
-          utterance.volume = 1;
-
-          // Prioriza uma voz brasileira quando disponível.
-          const voices = window.speechSynthesis.getVoices();
-
-          const ptVoice = voices.find(
-            voice => voice.lang.toLowerCase() === "pt-br"
-          );
-
-          if (ptVoice) {
-            utterance.voice = ptVoice;
-          }
-
-          utterance.onstart = () => {
-            if (requestId !== speechRequestId) {
-              return;
-            }
-
-            isListening = true;
-
-            setFeedback("🔊 Ouvindo a palavra...", "info");
-          };
-
-          utterance.onend = () => {
-            if (requestId !== speechRequestId) {
-              return;
-            }
-
-            isListening = false;
-
-            if (gameFinished || isAnswered) {
-              listenBtn.disabled = true;
-              return;
-            }
-
-            palavraInput.disabled = false;
-            checkBtn.disabled = false;
-            listenBtn.disabled = false;
-
-            setFeedback("✅ Áudio finalizado. Digite a palavra.", "info");
-
-            if (!timerStarted) {
-              startTimer();
-            }
-
-            palavraInput.focus();
-          };
-
-          utterance.onerror = (event) => {
-            if (requestId !== speechRequestId) {
-              return;
-            }
-
-            isListening = false;
-
-            if (event.error === "canceled" ||
-                event.error === "interrupted") {
-              return;
-            }
-
-            listenBtn.disabled = false;
-            palavraInput.disabled = true;
-            checkBtn.disabled = true;
-
-            setFeedback(
-              "⚠️ Falha no áudio. Clique em Ouvir palavra novamente.",
-              "erro"
-            );
-          };
-
-          window.speechSynthesis.speak(utterance);
-
-        }, 200);
-      }
-
-      function cancelSpeech() {
-        speechRequestId++;
-        isListening = false;
-
-        if ("speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
-        }
-      }
-
-      // =========================================
-      // TEMPO ESGOTADO
-      // =========================================
-
-      function handleTimeout() {
-        if (gameFinished || isAnswered) {
-          return;
-        }
-
-        isAnswered = true;
-        cancelSpeech();
-
-        palavraInput.disabled = true;
-        checkBtn.disabled = true;
-        listenBtn.disabled = true;
-
-        const correctWord = currentWordList[currentWordIndex];
-
-        setFeedback(
-          `⏰ Tempo esgotado! A palavra era: "${correctWord}"`,
-          "tempo"
-        );
-
-        totalAttempted++;
-
-        clearTimeout(advanceTimeout);
-
-        advanceTimeout = setTimeout(() => {
-          if (!gameFinished) {
-            handleNext();
-          }
-        }, 2000);
-
-        updateProgress();
-      }
-
-      // =========================================
-      // ATUALIZAÇÃO DA INTERFACE
-      // =========================================
-
-      function updateProgress() {
-        const phase = PHASES[currentPhaseIndex];
-
-        faseBadge.textContent = phase.label;
-        scoreDisplay.textContent = score;
-        progressText.textContent =
-          `${Math.min(totalAttempted, phase.palavras)}/${phase.palavras}`;
-      }
-
-      function showCurrentWord() {
-        if (gameFinished) {
-          return;
-        }
-
-        if (
-          !currentWordList.length ||
-          currentWordIndex >= currentWordList.length
-        ) {
-          finishPhase();
-          return;
-        }
-
-        isAnswered = false;
-
-        cancelSpeech();
-        resetTimer();
-
-        palavraInput.value = "";
-        palavraInput.disabled = true;
-        palavraInput.style.borderColor = "#3d5a7a";
-
-        checkBtn.disabled = true;
-        listenBtn.disabled = false;
-
-        setFeedback('🔊 Clique em "Ouvir palavra"', "info");
-
-        updateProgress();
-      }
-
-      // =========================================
-      // VERIFICAR RESPOSTA
-      // =========================================
-
-      function handleCheck() {
-        if (gameFinished || isAnswered) {
-          return;
-        }
-
-        if (isListening) {
-          setFeedback("⏳ Aguarde o áudio terminar.", "info");
-          return;
-        }
-
-        if (!timerStarted) {
-          setFeedback('🔊 Clique em "Ouvir palavra" primeiro.', "info");
-          return;
-        }
-
-        const userInput = palavraInput.value.trim();
-
-        if (userInput === "") {
-          setFeedback("✏️ Digite a palavra.", "erro");
-          return;
-        }
-
-        const correctWord = currentWordList[currentWordIndex];
-
-        if (normalizeText(userInput) === normalizeText(correctWord)) {
-          clearTimer();
-
-          score++;
-          totalAttempted++;
-          isAnswered = true;
-
-          palavraInput.disabled = true;
-          checkBtn.disabled = true;
-          listenBtn.disabled = true;
-
-          palavraInput.style.borderColor = "#6fbf6f";
-
-          setFeedback(
-            `🎉 ACERTOU! +1 ponto. Palavra: "${correctWord}"`,
-            "acerto"
-          );
-
-          updateProgress();
-
-          clearTimeout(advanceTimeout);
-
-          advanceTimeout = setTimeout(() => {
-            if (!gameFinished) {
-              handleNext();
-            }
-          }, 1500);
-
-        } else {
-          setFeedback(
-            "❌ Resposta incorreta. Tente novamente!",
-            "erro"
-          );
-
-          palavraInput.style.borderColor = "#bf6f6f";
-          palavraInput.value = "";
-
-          // Reinicia os 10 segundos para uma nova tentativa.
-          resetTimer();
-          startTimer();
-
-          palavraInput.focus();
-        }
-      }
-
-      // =========================================
-      // PRÓXIMA PALAVRA
-      // =========================================
-
-      function handleNext() {
-        if (gameFinished) {
-          return;
-        }
-
-        clearTimeout(advanceTimeout);
-        clearTimer();
-        cancelSpeech();
-
-        // Se o aluno avançar sem responder, conta como tentativa.
-        if (!isAnswered) {
-          totalAttempted++;
-        }
-
-        isAnswered = true;
-
-        const phase = PHASES[currentPhaseIndex];
-
-        if (
-          totalAttempted >= phase.palavras ||
-          currentWordIndex >= currentWordList.length - 1
-        ) {
-          finishPhase();
-          return;
-        }
-
-        currentWordIndex++;
-        showCurrentWord();
-      }
-
-      // =========================================
-      // FINALIZAÇÃO E MUDANÇA DE FASE
-      // =========================================
-
-      function finishPhase() {
-        clearTimer();
-        cancelSpeech();
-
-        const phase = PHASES[currentPhaseIndex];
-
-        updateProgress();
-
-        palavraInput.disabled = true;
-        checkBtn.disabled = true;
-        listenBtn.disabled = true;
-
-        if (score >= phase.meta) {
-          if (currentPhaseIndex === PHASES.length - 1) {
-            gameFinished = true;
-
-            setFeedback(
-              `🏆 Parabéns! Você concluiu as 3 fases! Última fase: ${score} acertos.`,
-              "fim"
-            );
-
-            return;
-          }
-
-          currentPhaseIndex++;
-
-          currentWordList = generateWordListForPhase(currentPhaseIndex);
-          currentWordIndex = 0;
-          score = 0;
-          totalAttempted = 0;
-
-          setFeedback(
-            `🎉 Parabéns! Você passou para ${PHASES[currentPhaseIndex].label}!`,
-            "acerto"
-          );
-
-          updateProgress();
-          showCurrentWord();
-
-        } else {
-          // Mantém a regra original: quem não alcança a meta
-          // precisa começar novamente pela Fase 1.
-          currentPhaseIndex = 0;
-
-          currentWordList = generateWordListForPhase(0);
-          currentWordIndex = 0;
-          score = 0;
-          totalAttempted = 0;
-
-          setFeedback(
-            `❌ Você não alcançou a meta de ${phase.meta} acertos. Voltando à Fase 1.`,
-            "erro"
-          );
-
-          updateProgress();
-          showCurrentWord();
-        }
-      }
-
-      // =========================================
-      // INICIALIZAÇÃO
-      // =========================================
-
-      function initGame() {
-        cancelSpeech();
-        clearTimer();
-        clearTimeout(advanceTimeout);
-
-        currentPhaseIndex = 0;
-        currentWordList = generateWordListForPhase(0);
-        currentWordIndex = 0;
-
-        score = 0;
-        totalAttempted = 0;
-        isAnswered = false;
-        gameFinished = false;
-        timerStarted = false;
-
-        palavraInput.value = "";
-        palavraInput.disabled = true;
-
-        checkBtn.disabled = true;
-        listenBtn.disabled = false;
-
-        updateProgress();
-        showCurrentWord();
-
-        setFeedback(
-          '🎧 Clique em "Ouvir palavra" para começar.',
-          "info"
-        );
-
-        if ("speechSynthesis" in window) {
-          window.speechSynthesis.getVoices();
-        }
-      }
-
-      // =========================================
-      // EVENTOS
-      // =========================================
-
-      listenBtn.addEventListener("click", handleListen);
-
-      checkBtn.addEventListener("click", handleCheck);
-
-      nextBtn.addEventListener("click", handleNext);
-
-      palavraInput.addEventListener("keydown", (event) => {
+    // Permite iniciar a tela inicial pressionando Enter.
+    [studentNameInput, studentSeriesInput].forEach(input => {
+      input.addEventListener("keydown", event => {
         if (event.key === "Enter") {
-          event.preventDefault();
-
-          if (!checkBtn.disabled) {
-            handleCheck();
-          }
+          continueButton.click();
         }
       });
+    });
 
-      // Inicia o jogo automaticamente ao carregar a página.
-      initGame();
+    // =====================================================
+    // ÁUDIO
+    // =====================================================
 
-    })();
+    function cancelSpeech() {
+      speechRequestId++;
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      isSpeaking = false;
+    }
+
+    function speakCurrentWord() {
+      if (gameFinished || isAnswered || isSpeaking) {
+        return;
+      }
+
+      if (!("speechSynthesis" in window)) {
+        feedback.textContent =
+          "Seu navegador não oferece leitura de voz. Experimente usar o Chrome.";
+        feedback.className = "feedback-wrong";
+        return;
+      }
+
+      clearInterval(timerId);
+      window.speechSynthesis.cancel();
+
+      const currentRequest = ++speechRequestId;
+      const word = FASES[phaseIndex][wordIndex];
+
+      isSpeaking = true;
+      answerInput.disabled = true;
+      checkButton.disabled = true;
+      listenButton.disabled = true;
+
+      feedback.textContent = "Escute com atenção...";
+      feedback.className = "feedback-neutral";
+
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "pt-BR";
+      utterance.rate = 0.78;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      const voices = window.speechSynthesis.getVoices();
+      const portugueseVoice = voices.find(voice =>
+        voice.lang.toLowerCase() === "pt-br"
+      );
+
+      if (portugueseVoice) {
+        utterance.voice = portugueseVoice;
+      }
+
+      utterance.onend = () => {
+        if (currentRequest !== speechRequestId || gameFinished) {
+          return;
+        }
+
+        isSpeaking = false;
+        listenButton.disabled = false;
+
+        if (!isAnswered) {
+          answerInput.disabled = false;
+          checkButton.disabled = false;
+          answerInput.focus();
+
+          startTimer();
+
+          feedback.textContent = "Digite a palavra que você ouviu.";
+          feedback.className = "feedback-neutral";
+        }
+      };
+
+      utterance.onerror = () => {
+        if (currentRequest !== speechRequestId || gameFinished) {
+          return;
+        }
+
+        isSpeaking = false;
+        listenButton.disabled = false;
+
+        if (!isAnswered) {
+          answerInput.disabled = false;
+          checkButton.disabled = false;
+
+          feedback.textContent =
+            "Não foi possível reproduzir o áudio. Clique em ouvir novamente.";
+          feedback.className = "feedback-wrong";
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    listenButton.addEventListener("click", speakCurrentWord);
+
+    // =====================================================
+    // CARREGAR PALAVRA
+    // =====================================================
+
+    function loadWord() {
+      clearInterval(timerId);
+      cancelSpeech();
+
+      if (phaseIndex >= FASES.length) {
+        showFinalResult();
+        return;
+      }
+
+      if (wordIndex >= FASES[phaseIndex].length) {
+        finishPhase();
+        return;
+      }
+
+      isAnswered = false;
+      isSpeaking = false;
+      secondsLeft = TEMPO_POR_PALAVRA;
+
+      const phase = FASES[phaseIndex];
+
+      phaseLabel.textContent = `${phaseIndex + 1}ª FASE`;
+      phaseDescription.textContent =
+        `Fase ${phaseIndex + 1} de ${FASES.length} — ${phase.length} palavras`;
+
+      progressText.textContent =
+        `Palavra ${wordIndex + 1} de ${phase.length}`;
+
+      progressFill.style.width =
+        `${((wordIndex + 1) / phase.length) * 100}%`;
+
+      phaseScoreElement.textContent = phaseScore;
+      correctCountElement.textContent = totalCorrect;
+      timeLeftElement.textContent = secondsLeft;
+
+      answerInput.value = "";
+      answerInput.disabled = true;
+      checkButton.disabled = true;
+      listenButton.disabled = false;
+
+      nextButton.classList.add("hidden");
+      checkButton.classList.remove("hidden");
+
+      feedback.textContent = "Clique em “Ouvir palavra” para começar.";
+      feedback.className = "feedback-neutral";
+    }
+
+    // =====================================================
+    // CRONÔMETRO
+    // =====================================================
+
+    function startTimer() {
+      clearInterval(timerId);
+
+      secondsLeft = TEMPO_POR_PALAVRA;
+      timeLeftElement.textContent = secondsLeft;
+
+      timerId = setInterval(() => {
+        if (isAnswered || gameFinished || isSpeaking) {
+          clearInterval(timerId);
+          return;
+        }
+
+        secondsLeft--;
+        timeLeftElement.textContent = secondsLeft;
+
+        if (secondsLeft <= 0) {
+          clearInterval(timerId);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleTimeout() {
+      if (isAnswered || gameFinished) {
+        return;
+      }
+
+      isAnswered = true;
+      totalAnswered++;
+
+      cancelSpeech();
+
+      answerInput.disabled = true;
+      checkButton.disabled = true;
+      listenButton.disabled = true;
+
+      feedback.textContent =
+        `Tempo esgotado! A palavra era: ${FASES[phaseIndex][wordIndex]}.`;
+      feedback.className = "feedback-wrong";
+
+      showNextButton();
+    }
+
+    // =====================================================
+    // VERIFICAR RESPOSTA
+    // =====================================================
+
+    function normalizeWord(word) {
+      return word
+        .trim()
+        .toLocaleLowerCase("pt-BR")
+        .normalize("NFC");
+    }
+
+    function checkAnswer() {
+      if (isAnswered || isSpeaking || gameFinished) {
+        return;
+      }
+
+      const answer = answerInput.value.trim();
+
+      if (!answer) {
+        feedback.textContent = "Digite uma resposta antes de verificar.";
+        feedback.className = "feedback-wrong";
+        answerInput.focus();
+        return;
+      }
+
+      const correctWord = FASES[phaseIndex][wordIndex];
+
+      if (normalizeWord(answer) === normalizeWord(correctWord)) {
+        isAnswered = true;
+        totalAnswered++;
+        totalCorrect++;
+        phaseScore++;
+
+        clearInterval(timerId);
+        cancelSpeech();
+
+        phaseScoreElement.textContent = phaseScore;
+        correctCountElement.textContent = totalCorrect;
+
+        feedback.textContent = "✅ Muito bem! Você acertou!";
+        feedback.className = "feedback-correct";
+
+        answerInput.disabled = true;
+        checkButton.disabled = true;
+        listenButton.disabled = true;
+
+        showNextButton();
+      } else {
+        feedback.textContent =
+          "❌ Ainda não está correto. Tente novamente enquanto há tempo.";
+        feedback.className = "feedback-wrong";
+
+        answerInput.focus();
+        answerInput.select();
+      }
+    }
+
+    checkButton.addEventListener("click", checkAnswer);
+
+    answerInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        if (!checkButton.disabled) {
+          checkAnswer();
+        } else if (!nextButton.classList.contains("hidden")) {
+          nextWord();
+        }
+      }
+    });
+
+    // =====================================================
+    // PRÓXIMA PALAVRA
+    // =====================================================
+
+    function showNextButton() {
+      nextButton.classList.remove("hidden");
+      checkButton.classList.add("hidden");
+      nextButton.focus();
+    }
+
+    function nextWord() {
+      if (gameFinished) {
+        return;
+      }
+
+      clearInterval(timerId);
+      cancelSpeech();
+
+      wordIndex++;
+
+      if (wordIndex >= FASES[phaseIndex].length) {
+        finishPhase();
+      } else {
+        loadWord();
+      }
+    }
+
+    nextButton.addEventListener("click", nextWord);
+
+    // =====================================================
+    // ENCERRAR FASE
+    // =====================================================
+
+    function finishPhase() {
+      clearInterval(timerId);
+      cancelSpeech();
+
+      const meta = METAS[phaseIndex];
+      const quantidade = FASES[phaseIndex].length;
+      const pontuacao = phaseScore;
+
+      gameScreen.classList.add("hidden");
+
+      if (pontuacao >= meta) {
+        phaseIndex++;
+
+        if (phaseIndex >= FASES.length) {
+          showFinalResult();
+          return;
+        }
+
+        wordIndex = 0;
+        phaseScore = 0;
+
+        alert(
+          `Parabéns! Você concluiu a fase com ${pontuacao} acertos ` +
+          `em ${quantidade} palavras. Vamos para a ${phaseIndex + 1}ª fase!`
+        );
+
+        gameScreen.classList.remove("hidden");
+        loadWord();
+      } else {
+        alert(
+          `Você fez ${pontuacao} pontos de ${quantidade} palavras. ` +
+          `A meta desta fase é ${meta} acertos. Vamos tentar novamente!`
+        );
+
+        wordIndex = 0;
+        phaseScore = 0;
+
+        gameScreen.classList.remove("hidden");
+        loadWord();
+      }
+    }
+
+    // =====================================================
+    // RESULTADO FINAL
+    // =====================================================
+
+    function showFinalResult() {
+      clearInterval(timerId);
+      cancelSpeech();
+
+      gameFinished = true;
+
+      gameScreen.classList.add("hidden");
+      startScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+
+      document.getElementById("resultName").textContent = studentName;
+      document.getElementById("resultSeries").textContent = studentSeries;
+
+      const percentage = totalWords > 0
+        ? Math.round((totalCorrect / totalWords) * 100)
+        : 0;
+
+      document.getElementById("finalScore").innerHTML =
+        `<strong>Aluno:</strong> ${escapeHTML(studentName)}<br>` +
+        `<strong>Série:</strong> ${escapeHTML(studentSeries)}<br>` +
+        `<strong>Palavras corretas:</strong> ${totalCorrect} de ${totalWords}<br>` +
+        `<strong>Aproveitamento:</strong> ${percentage}%`;
+
+      let message = "";
+
+      if (percentage >= 90) {
+        message = "Excelente! Seu domínio da ortografia foi muito bom.";
+      } else if (percentage >= 70) {
+        message = "Muito bem! Continue praticando para avançar ainda mais.";
+      } else if (percentage >= 50) {
+        message = "Bom esforço! Revise as palavras e continue treinando.";
+      } else {
+        message = "Continue praticando. A leitura e a escrita ajudam a melhorar a ortografia.";
+      }
+
+      document.getElementById("finalMessage").textContent = message;
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[character]);
+    }
+
+    // Evita que o navegador continue falando após sair da página.
+    window.addEventListener("beforeunload", () => {
+      clearInterval(timerId);
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    });
   </script>
 </body>
 </html>
-
 
