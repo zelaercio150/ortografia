@@ -27,7 +27,7 @@
       width: 100%;
       max-width: 720px;
       padding: 30px;
-      background: #ffffff;
+      background: #fff;
       border-radius: 20px;
       box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
       text-align: center;
@@ -97,22 +97,17 @@
     }
 
     .primary {
-      color: white;
+      color: #fff;
       background: #2563eb;
     }
 
     .success {
-      color: white;
+      color: #fff;
       background: #15803d;
     }
 
-    .secondary {
-      color: white;
-      background: #475569;
-    }
-
     .audio {
-      color: white;
+      color: #fff;
       background: #7c3aed;
       font-size: 1.1rem;
     }
@@ -221,6 +216,7 @@
       background: #eff6ff;
       border-radius: 12px;
       line-height: 1.8;
+      overflow-wrap: anywhere;
     }
 
     .instructions {
@@ -266,6 +262,7 @@
     <!-- TELA INICIAL -->
     <section id="startScreen">
       <h1>🔊 Ouça &amp; Soletre</h1>
+
       <p class="subtitle">
         Um desafio de ortografia dividido em três fases.
         Escute a palavra e escreva-a corretamente!
@@ -305,8 +302,8 @@
           <li>Clique em “Ouvir palavra”.</li>
           <li>Digite a palavra que escutou.</li>
           <li>Clique em “Verificar resposta”.</li>
-          <li>Você terá 10 segundos para responder após o áudio.</li>
-          <li>Conclua as três fases para ver seu resultado.</li>
+          <li>Você terá 15 segundos para responder após o áudio.</li>
+          <li>Depois da conferência, avance para a próxima palavra.</li>
         </ol>
       </div>
     </section>
@@ -352,7 +349,7 @@
       </button>
 
       <div class="timer">
-        Tempo restante: <span id="timeLeft">10</span>s
+        Tempo restante: <span id="timeLeft">15</span>s
       </div>
 
       <div class="answer-area">
@@ -393,7 +390,6 @@
       </div>
 
       <div class="final-score" id="finalScore"></div>
-
       <p id="finalMessage"></p>
 
       <p class="subtitle">
@@ -406,9 +402,9 @@
   <script>
     // =====================================================
     // BANCO DE PALAVRAS
-    // 1ª fase: 25 palavras
-    // 2ª fase: 25 palavras
-    // 3ª fase: 21 palavras
+    // Fase 1: 25 palavras
+    // Fase 2: 25 palavras
+    // Fase 3: 21 palavras
     // =====================================================
 
     const FASES = [
@@ -435,9 +431,11 @@
       ]
     ];
 
-    // Metas proporcionais à quantidade de palavras por fase.
+    // Metas mínimas para avançar de fase.
     const METAS = [20, 20, 17];
-    const TEMPO_POR_PALAVRA = 10;
+
+    // Tempo para responder após o áudio.
+    const TEMPO_POR_PALAVRA = 15;
 
     // =====================================================
     // ELEMENTOS DA PÁGINA
@@ -515,7 +513,6 @@
       loadWord();
     });
 
-    // Permite iniciar a tela inicial pressionando Enter.
     [studentNameInput, studentSeriesInput].forEach(input => {
       input.addEventListener("keydown", event => {
         if (event.key === "Enter") {
@@ -525,7 +522,7 @@
     });
 
     // =====================================================
-    // ÁUDIO
+    // CONTROLE DO ÁUDIO
     // =====================================================
 
     function cancelSpeech() {
@@ -673,7 +670,7 @@
     }
 
     // =====================================================
-    // CRONÔMETRO
+    // CRONÔMETRO DE 15 SEGUNDOS
     // =====================================================
 
     function startTimer() {
@@ -712,15 +709,18 @@
       checkButton.disabled = true;
       listenButton.disabled = true;
 
+      const correctWord = FASES[phaseIndex][wordIndex];
+
       feedback.textContent =
-        `Tempo esgotado! A palavra era: ${FASES[phaseIndex][wordIndex]}.`;
+        `⏰ Tempo esgotado! A palavra correta era: ${correctWord}.`;
       feedback.className = "feedback-wrong";
 
       showNextButton();
     }
 
     // =====================================================
-    // VERIFICAR RESPOSTA
+    // CONFERIR RESPOSTA
+    // A RESPOSTA É DEFINITIVA: CERTA OU ERRADA.
     // =====================================================
 
     function normalizeWord(word) {
@@ -746,34 +746,35 @@
 
       const correctWord = FASES[phaseIndex][wordIndex];
 
+      // Bloqueia definitivamente a resposta.
+      isAnswered = true;
+      totalAnswered++;
+
+      clearInterval(timerId);
+      cancelSpeech();
+
+      answerInput.disabled = true;
+      checkButton.disabled = true;
+      listenButton.disabled = true;
+
       if (normalizeWord(answer) === normalizeWord(correctWord)) {
-        isAnswered = true;
-        totalAnswered++;
         totalCorrect++;
         phaseScore++;
-
-        clearInterval(timerId);
-        cancelSpeech();
 
         phaseScoreElement.textContent = phaseScore;
         correctCountElement.textContent = totalCorrect;
 
-        feedback.textContent = "✅ Muito bem! Você acertou!";
+        feedback.textContent =
+          `✅ Resposta correta! A palavra era: ${correctWord}.`;
         feedback.className = "feedback-correct";
-
-        answerInput.disabled = true;
-        checkButton.disabled = true;
-        listenButton.disabled = true;
-
-        showNextButton();
       } else {
         feedback.textContent =
-          "❌ Ainda não está correto. Tente novamente enquanto há tempo.";
+          `❌ Resposta incorreta! A forma correta é: ${correctWord}.`;
         feedback.className = "feedback-wrong";
-
-        answerInput.focus();
-        answerInput.select();
       }
+
+      // O aluno avança após ver o resultado.
+      showNextButton();
     }
 
     checkButton.addEventListener("click", checkAnswer);
@@ -884,11 +885,26 @@
         ? Math.round((totalCorrect / totalWords) * 100)
         : 0;
 
-      document.getElementById("finalScore").innerHTML =
-        `<strong>Aluno:</strong> ${escapeHTML(studentName)}<br>` +
-        `<strong>Série:</strong> ${escapeHTML(studentSeries)}<br>` +
-        `<strong>Palavras corretas:</strong> ${totalCorrect} de ${totalWords}<br>` +
-        `<strong>Aproveitamento:</strong> ${percentage}%`;
+      const finalScore = document.getElementById("finalScore");
+
+      finalScore.replaceChildren();
+
+      const lines = [
+        ["Aluno: ", studentName],
+        ["Série: ", studentSeries],
+        ["Palavras corretas: ", `${totalCorrect} de ${totalWords}`],
+        ["Aproveitamento: ", `${percentage}%`]
+      ];
+
+      lines.forEach(([label, value]) => {
+        const line = document.createElement("div");
+        const strong = document.createElement("strong");
+
+        strong.textContent = label;
+        line.appendChild(strong);
+        line.appendChild(document.createTextNode(value));
+        finalScore.appendChild(line);
+      });
 
       let message = "";
 
@@ -899,23 +915,14 @@
       } else if (percentage >= 50) {
         message = "Bom esforço! Revise as palavras e continue treinando.";
       } else {
-        message = "Continue praticando. A leitura e a escrita ajudam a melhorar a ortografia.";
+        message =
+          "Continue praticando. A leitura e a escrita ajudam a melhorar a ortografia.";
       }
 
       document.getElementById("finalMessage").textContent = message;
     }
 
-    function escapeHTML(value) {
-      return String(value).replace(/[&<>"']/g, character => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      })[character]);
-    }
-
-    // Evita que o navegador continue falando após sair da página.
+    // Cancela o áudio se a página for fechada.
     window.addEventListener("beforeunload", () => {
       clearInterval(timerId);
 
